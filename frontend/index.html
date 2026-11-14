@@ -8,10 +8,11 @@
 <style>
   *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
   body{background:#f7f8fa;color:#222}
-  header{background:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.06);position:sticky;top:0}
+  header{background:#fff;padding:16px 20px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:14px;box-shadow:0 2px 8px rgba(0,0,0,.06);position:sticky;top:0}
   header b{font-size:22px;color:#1877f2}
   header b span{color:#00a884}
-  nav a{margin-left:16px;text-decoration:none;color:#333;font-weight:600;font-size:14px}
+  nav{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:8px 16px}
+  nav a{white-space:nowrap;text-decoration:none;color:#333;font-weight:600;font-size:14px}
   nav a.btn{background:#1877f2;color:#fff;padding:9px 16px;border-radius:8px}
   .hero{max-width:900px;margin:40px auto 20px;padding:0 20px;text-align:center}
   .hero h1{font-size:36px;line-height:1.2}
@@ -31,7 +32,10 @@
   .step{background:#eef4ff;padding:18px;border-radius:12px;text-align:center}
   .step b{font-size:28px;color:#1877f2}
   footer{background:#111;color:#ddd;padding:28px 20px;text-align:center;margin-top:40px}
-  footer a{color:#fff;text-decoration:none;margin:0 10px;font-weight:600}
+  .footer-links{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 20px}
+  footer a{color:#fff;text-decoration:none;font-weight:600}
+  .footer-contact{display:flex;flex-wrap:wrap;justify-content:center;gap:12px 24px}
+  .footer-contact a{display:inline-flex;align-items:center;gap:7px}
   footer p{margin-top:12px;font-size:13px;color:#aaa}
   /* Cookie Modal */
   #cookieOverlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:flex-end;justify-content:center;z-index:999}
@@ -42,7 +46,20 @@
   .accept{background:#1877f2;color:#fff}
   .decline{background:#eee}
   .manage{background:#fff;border:1px solid #ddd !important}
-  @media(max-width:700px){.card-wrap,.steps{grid-template-columns:1fr}.hero h1{font-size:28px}}
+  @media(max-width:700px){
+    .card-wrap,.steps{grid-template-columns:1fr}
+    .hero h1{font-size:28px}
+    header{flex-direction:column;padding:14px 16px}
+    nav{justify-content:center;gap:10px 14px}
+    footer{padding:24px 16px}
+    .footer-contact{flex-direction:column;align-items:center;gap:12px}
+  }
+  @media(max-width:380px){
+    nav{gap:8px 12px}
+    nav a{font-size:13px}
+    nav a.btn{padding:8px 12px}
+    .footer-links{flex-direction:column;align-items:center;gap:12px}
+  }
 </style>
 </head>
 <body>
@@ -94,13 +111,15 @@
 </div>
 
 <footer>
-  <a href="index.html">Home</a>
-  <a href="dashboard.html">Dashboard</a>
-  <a href="privacy.html">Privacy Policy</a>
-  <a href="terms.html">Terms & Conditions</a>
-  <a href="cookies.html">Cookie Policy</a>
+  <nav class="footer-links" aria-label="Footer">
+    <a href="index.html">Home</a>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="privacy.html">Privacy Policy</a>
+    <a href="terms.html">Terms & Conditions</a>
+    <a href="cookies.html">Cookie Policy</a>
+  </nav>
   <p>© 2026 Desito Bot - Made in Nigeria. We help small businesses reply faster.</p>
-  <p>
+  <p class="footer-contact">
     <a class="contact-link" href="mailto:Desitotechai@gmail.com"><i class="fa-solid fa-envelope" aria-hidden="true"></i> Email: support@Desitobot.com</a>
     <a class="contact-link" href="https://wa.me/2348108242257" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i> WhatsApp</a>
   </p>
