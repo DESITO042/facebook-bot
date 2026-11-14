@@ -1,6 +1,0 @@
-groq
-python-dotenv
-fastapi
-uvicorn
-requests
-pydantic
