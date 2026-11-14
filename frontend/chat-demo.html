@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Desito AI Bot Demo</title>
+  <style>
+    * { font-family: Arial, sans-serif; box-sizing: border-box; }
+    body { margin: 0; background: #f0f2f5; display: flex; min-height: 100vh; }
+    .sidebar { width: 260px; background: #111b21; color: white; padding: 20px; }
+    .sidebar h2 { color: #a1324a; }
+    .sidebar p { color: #8696a0; font-size: 13px; }
+    .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .topbar { background: white; padding: 15px 20px; display: flex; justify-content: space-between; gap: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+    .topbar b { font-size: 18px; }
+    .badge { background: #25d366; color: white; padding: 5px 12px; border-radius: 20px; font-size: 12px; white-space: nowrap; }
+    .chat-area { flex: 1; min-height: 300px; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+    .msg { max-width: 70%; padding: 12px 15px; border-radius: 12px; font-size: 14px; line-height: 1.4; overflow-wrap: anywhere; }
+    .customer { background: white; align-self: flex-start; }
+    .bot { background: #d9fdd3; align-self: flex-end; }
+    .input-box { background: white; padding: 15px; display: flex; gap: 10px; }
+    .input-box input { flex: 1; min-width: 0; padding: 12px; border: 1px solid #ddd; border-radius: 25px; outline: none; }
+    .input-box button { background: #25d366; color: white; border: 0; padding: 12px 25px; border-radius: 25px; cursor: pointer; font-weight: bold; }
+    .stat { background: white; padding: 12px; border-radius: 10px; margin-top: 15px; color: #111b21; }
+    .stat b { font-size: 22px; }
+    .sidebar a { color: white; }
+    .site-link { display: inline-block; margin: 20px 0 8px; color: #b7ee65 !important; }
+    @media (max-width: 640px) {
+      body { flex-direction: column; }
+      .sidebar { width: 100%; padding: 12px 16px; }
+      .sidebar h2 { margin: 0; font-size: 18px; }
+      .sidebar > p:first-of-type, .stat { display: none; }
+      .site-link { margin: 10px 0 0; }
+      .chat-area { min-height: 45vh; }
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <h2>Desito AI Bot</h2>
+    <p>Desito Store - Enugu</p>
+    <div class="stat"><span>Total Chats</span><br><b id="totalChats">0</b></div>
+    <div class="stat"><span>Orders Today</span><br><b>3</b></div>
+    <div class="stat"><span>Status</span><br><b style="color:#25D366;font-size:14px">● Online</b></div>
+    <p style="margin-top:20px">Connected Page:<br><b style="color:white">Desito Store</b></p>
+    <a class="site-link" href="/">Visit Desito Tech portfolio</a><br>
+    <a href="dashboard.html">Open dashboard</a>
+  </aside>
+  <main class="main">
+    <div class="topbar">
+      <b>Live Chat - Test Customer</b>
+      <span class="badge">AI Brain: Connected</span>
+    </div>
+    <div class="chat-area" id="chatArea" aria-live="polite">
+      <div class="msg bot">Hello my customer! Welcome to Amos Store 🙏 How I fit help you today?</div>
+    </div>
+    <form class="input-box" id="chatForm">
+      <input id="msgInput" placeholder="Type as customer: e.g. how much be iphone" aria-label="Message to bot">
+      <button type="submit">Send</button>
+    </form>
+  </main>
+  <script>
+    let count = 0;
+    const form = document.getElementById('chatForm');
+    const input = document.getElementById('msgInput');
+    const area = document.getElementById('chatArea');
+
+    function addMessage(text, kind) {
+      const message = document.createElement('div');
+      message.className = `msg ${kind}`;
+      message.textContent = text;
+      area.appendChild(message);
+      area.scrollTop = area.scrollHeight;
+    }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const text = input.value.trim();
+      if (!text) return;
+      addMessage(text, 'customer');
+      input.value = '';
+      document.getElementById('totalChats').textContent = String(++count);
+
+      try {
+        const response = await fetch('http://localhost:5000/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text })
+        });
+        if (!response.ok) throw new Error(`Chat request failed (${response.status})`);
+        const data = await response.json();
+        addMessage(data.reply || 'The chat service returned no reply.', 'bot');
+      } catch (error) {
+        addMessage('Could not reach the chat service. Please check that the backend is running.', 'bot');
+      }
+    });
+  </script>
+</body>
+</html>

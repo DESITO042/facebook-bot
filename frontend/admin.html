@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Dashboard - Bot SaaS</title>
+  <style>
+    body{font-family:Arial;background:#111827;padding:20px;color:#fff}
+    .box{background:#1f2937;padding:20px;border-radius:10px;max-width:800px;margin:auto}
+    button{padding:10px 15px;border-radius:8px;border:none;font-weight:bold;cursor:pointer}
+    .login-btn{background:#1877F2;color:#fff;width:100%;padding:12px}
+    .page{background:#374151;padding:15px;border-radius:8px;margin:12px 0}
+    .disconnect{background:#ef4444;color:#fff;margin-top:10px}
+    .tag{background:#10b981;color:#fff;padding:3px 8px;border-radius:5px;font-size:12px}
+    .tag-no{background:#ef4444;color:#fff;padding:3px 8px;border-radius:5px;font-size:12px}
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>👑 Admin Dashboard</h2>
+    <p>Welcome, <b id="adminName">Loading...</b> | <a href="dashboard.html" style="color:#60a5fa;">Go to User Dashboard</a></p>
+    <button class="login-btn" onclick="window.location.href='/auth/facebook?next=/admin.html'">Login as Admin</button>
+    <h3>All Connected Pages (<span id="count">0</span>)</h3>
+    <div id="pages">Loading...</div>
+  </div>
+<script>
+  async function loadMe(){
+    let r = await fetch('/api/me');
+    let me = await r.json();
+    document.getElementById('adminName').innerText = me.loggedIn ? me.userName + ' (' + me.userId + ')' : 'Not Logged In';
+  }
+  async function loadAll(){
+    let res = await fetch('/api/admin/pages');
+    let data = await res.json();
+    let box = document.getElementById('pages');
+    if(data.success === false){ box.innerHTML = '❌ ' + data.msg + ' - Make sure your Facebook ID dey for ADMIN_IDS for server.js'; return; }
+    if(!data || data.length===0){ box.innerHTML='No pages yet.'; return; }
+    document.getElementById('count').innerText = data.length;
+    box.innerHTML = data.map(p => `
+      <div class="page">
+        <b style="font-size:18px;">${p.name}</b><br>
+        Page ID: ${p.pageId}<br>
+        Owner: <b>${p.userName || 'Unknown'}</b> (${p.userId || 'No ID'})<br>
+        Status: ${p.status || 'Connected'} | Subscribed: ${p.subscribed ? '<span class="tag">YES ✅</span>' : '<span class="tag-no">NO ❌</span>'}<br>
+        Knowledge: ${(p.knowledge || '').length} chars<br>
+        ${p.subscribeError ? `<span style="color:#fca5a5;">Error: ${p.subscribeError}</span><br>` : ''}
+        <button class="disconnect" onclick="disconnectPage('${p.pageId}','${p.name}')">🔌 Disconnect Page</button>
+      </div>
+    `).join('');
+  }
+  async function disconnectPage(pageId, name){
+    if(!confirm('Disconnect ' + name + '? Bot go stop replying for this Page.')) return;
+    let res = await fetch('/api/admin/pages/' + pageId, { method: 'DELETE' });
+    let data = await res.json();
+    alert(data.msg || 'Done');
+    loadAll();
+  }
+  loadMe();
+  loadAll();
+</script>
+</body>
+</html>

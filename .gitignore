@@ -1,0 +1,22 @@
+# Env files - VERY IMPORTANT, no push your Facebook token
+.env
+ai-brain/.env
+backend/.env
+
+# Node
+node_modules/
+backend/node_modules/
+
+# Python
+__pycache__/
+*.pyc
+ai-brain/__pycache__/
+venv/
+.env.local
+
+# VS Code / OS
+.vscode/
+.DS_Store
+
+# Logs
+*.log

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard - Bot SaaS</title>
+  <style>
+    body { font-family: Arial; background: #111827; padding: 20px; color: #fff }
+    .box { background: #1f2937; padding: 20px; border-radius: 10px; max-width: 750px; margin: auto }
+    button { padding: 10px 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer }
+    .login-btn { background: #1877F2; color: #fff; width: 100%; padding: 12px }
+    .save-btn { background: #10b981; color: #fff; margin-top: 10px }
+    .disconnect-btn { background: #ef4444; color: #fff; margin-top: 10px; margin-left: 5px }
+    input, textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #4b5563; background: #374151; color: #fff; box-sizing: border-box; margin-top: 5px }
+    .page { background: #374151; padding: 15px; border-radius: 8px; margin: 15px 0 }
+    .toggle-row { display: flex; justify-content: space-between; align-items: center; background: #1f2937; padding: 10px 12px; border-radius: 8px; margin: 8px 0 }
+    .switch { position: relative; display: inline-block; width: 50px; height: 26px }
+    .switch input { opacity: 0; width: 0; height: 0 }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #6b7280; transition: .3s; border-radius: 26px }
+    .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background: white; transition: .3s; border-radius: 50% }
+    input:checked+.slider { background: #10b981 }
+    input:checked+.slider:before { transform: translateX(24px) }
+    label { font-size: 13px; color: #d1d5db }
+    .login-btn-wrap{ position:relative; isolation:isolate; width:min(100%,420px); margin:8px 0; padding:2px; border-radius:18px; overflow:hidden; }
+    .login-btn-wrap::before{ content:""; position:absolute; inset:-70%; z-index:-1; background:conic-gradient(from 0deg,transparent 0deg 300deg,rgba(255,255,255,.3) 320deg,#00a884 340deg,#fff 350deg,transparent 360deg); animation:login-orbit 3.5s linear infinite; }
+    @keyframes login-orbit{to{transform:rotate(360deg)}}
+    .login-btn{ width:100%; min-height:64px; margin:0; padding:12px 18px; display:flex; align-items:center; justify-content:center; gap:12px; border:0; border-radius:16px; background:linear-gradient(115deg,#0866ff 0%,#1877f2 55%,#3588ff 100%); box-shadow:0 10px 24px rgba(24,119,242,.28),inset 0 1px 0 rgba(255,255,255,.28); color:#fff; font-size:16px; font-weight:700; cursor:pointer; }
+    .fb-icon{ width:38px; height:38px; display:grid; place-items:center; flex:0 0 38px; border:1px solid rgba(24,119,242,.12); border-radius:50%; background:linear-gradient(145deg,#fff,#edf4ff); }
+    .fb-icon svg{display:block;width:25px;height:25px}
+    .status-dot{ display:inline-block; width:8px; height:8px; border-radius:50%; background:#10b981; margin-right:6px }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>🤖 My Dashboard</h2>
+    <p>Welcome, <b id="userName">Loading...</b> <a href="/auth/logout" style="color:#fca5a5;">Logout</a></p>
+    <p style="font-size:12px;color:#9ca3af;"><span class="status-dot"></span>Live data from MongoDB • <span id="lastUpdated">-</span></p>
+
+    <div class="login-btn-wrap">
+      <button class="login-btn" onclick="window.location.href='/auth/facebook?next=/dashboard.html'">
+        <span class="fb-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="#1877f2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></span>
+        Login with Facebook + Connect Page
+      </button>
+    </div>
+    
+    <h3>My Connected Pages (<span id="count">0</span>)</h3>
+    <div id="pages">Loading from MongoDB...</div>
+  </div>
+<script>
+  // Escape HTML so knowledge with " < > no go break page
+  function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  async function loadMe() {
+    try {
+      let r = await fetch('/api/me');
+      let me = await r.json();
+      document.getElementById('userName').innerText = me.loggedIn ? me.userName : 'Not Logged In';
+    } catch(e){ document.getElementById('userName').innerText = 'Not Logged In'; }
+  }
+
+  async function loadPages() {
+    let box = document.getElementById('pages');
+    try {
+      // THIS IS MONGODB - /api/pages now reads from MongoDB collection 'pages'
+      let res = await fetch('/api/pages');
+      let data = await res.json();
+      document.getElementById('lastUpdated').innerText = 'Updated ' + new Date().toLocaleTimeString();
+      if (!data || data.length === 0) { box.innerHTML = 'No pages yet. Login with Facebook to connect.'; document.getElementById('count').innerText = 0; return; }
+      document.getElementById('count').innerText = data.length;
+      box.innerHTML = data.map(p => `
+      <div class="page">
+        <b style="font-size:18px;">${esc(p.name)}</b><br>
+        <span style="font-size:12px;color:#9ca3af;">ID: ${esc(p.pageId)} | Subscribed: ${p.subscribed ? '✅' : '❌ ' + esc(p.subscribeError || '')} | MongoDB: ✅</span><br><br>
+        <div id="handover-${p.pageId}" style="background:#7f1d1d;padding:10px;border-radius:8px;margin:10px 0;display:none;">
+          <b>🔴 Needs Human</b> - <span id="handover-text-${p.pageId}"></span><br>
+          <button onclick="resumeBot('${p.pageId}')" style="background:#fff;color:#000;margin-top:8px;padding:6px 12px;border-radius:6px;">▶️ Resume Bot</button>
+        </div>
+        <label>👋 Automated Welcome Message (when person say Hi/Hello)</label>
+        <textarea id="welcome-${p.pageId}" rows="2">${esc(p.welcomeMessage || '')}</textarea>
+        <div class="toggle-row"><span>💬 Auto Reply to Message</span><label class="switch"><input type="checkbox" id="msg-${p.pageId}" ${p.autoReplyEnabled !== false ? 'checked' : ''}><span class="slider"></span></label></div>
+        <div class="toggle-row"><span>💭 Automatic Comment Reply</span><label class="switch"><input type="checkbox" id="cmt-${p.pageId}" ${p.autoCommentEnabled !== false ? 'checked' : ''}><span class="slider"></span></label></div>
+        <label>🧠 Knowledge / FAQ - Bot go use this to answer (Saved to MongoDB)</label>
+        <textarea id="know-${p.pageId}" rows="4">${esc(p.knowledge || '')}</textarea>
+        <button class="save-btn" onclick="saveSettings('${p.pageId}')">💾 Save Settings</button>
+        <button class="save-btn" onclick="saveKnowledge('${p.pageId}')" style="background:#3b82f6;">💾 Save Knowledge to MongoDB</button>
+        <button class="disconnect-btn" onclick="disconnectPage('${p.pageId}')">🔌 Disconnect</button>
+      </div>
+    `).join('');
+      loadHandover();
+    } catch(e) {
+      box.innerHTML = 'No account Found it seems like you have not login yet ';
+    }
+  }
+
+  async function saveSettings(pageId) {
+    let welcomeMessage = document.getElementById('welcome-' + pageId).value;
+    let autoReplyEnabled = document.getElementById('msg-' + pageId).checked;
+    let autoCommentEnabled = document.getElementById('cmt-' + pageId).checked;
+    let res = await fetch('/api/pages/' + pageId + '/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ welcomeMessage, autoReplyEnabled, autoCommentEnabled }) });
+    let data = await res.json();
+    alert(data.message || 'Saved to MongoDB ✅');
+    loadPages();
+  }
+  async function loadHandover() {
+    try {
+      let res = await fetch('/api/handover');
+      let list = await res.json();
+      document.querySelectorAll('[id^="handover-"]').forEach(el => el.style.display = 'none');
+      list.forEach(h => {
+        let box = document.getElementById('handover-' + h.pageId);
+        if (box) {
+          box.style.display = 'block';
+          document.getElementById('handover-text-' + h.pageId).innerText = `Customer ${h.senderId} - ${h.minsLeft} mins left - Said: "${h.reason}"`;
+          box.dataset.key = h.key;
+        }
+      });
+    } catch(e){}
+  }
+  async function resumeBot(pageId) {
+    let box = document.getElementById('handover-' + pageId);
+    let key = box.dataset.key;
+    let res = await fetch('/api/handover/resume', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key }) });
+    let data = await res.json();
+    alert(data.message);
+    loadHandover();
+  }
+  async function saveKnowledge(pageId) {
+    let knowledge = document.getElementById('know-' + pageId).value;
+    let res = await fetch('/api/pages/' + pageId + '/knowledge', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ knowledge }) });
+    let data = await res.json();
+    alert(data.message || data.msg || 'Saved to MongoDB ✅');
+    loadPages();
+  }
+  async function disconnectPage(pageId) {
+    if (!confirm('Disconnect this page?')) return;
+    let res = await fetch('/api/pages/' + pageId, { method: 'DELETE' });
+    let data = await res.json();
+    alert(data.msg || 'Disconnected');
+    loadPages();
+  }
+  setInterval(loadHandover, 10000);
+  loadMe();
+  loadPages();
+</script>
+</body>
+</html>

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f3f6fc">
+    <title>Desito Smart AI Bot</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f3f6fc 0%, #edf8f6 100%);
+            color: #222
+        }
+
+        header {
+            background: #fff;
+            padding: 16px max(20px, calc((100% - 1120px)/2));
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            box-shadow: 0 2px 12px rgba(24, 119, 242, .09);
+            position: sticky;
+            top: 0;
+            z-index: 10
+        }
+
+        header b {
+            font-size: 22px;
+            color: #1877f2;
+            white-space: nowrap
+        }
+
+        header b span {
+            color: #00a884
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+            gap: 8px 18px
+        }
+
+        nav a {
+            color: #333;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: color .2s ease
+        }
+
+        nav a:hover,
+        footer a:hover {
+            color: #1877f2
+        }
+
+        nav a.btn {
+            background: #1877f2;
+            color: #fff;
+            padding: 10px 16px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(24, 119, 242, .2)
+        }
+
+        nav a.btn:hover {
+            background: #1266d6;
+            color: #fff
+        }
+
+        .wrap {
+            width: min(800px, calc(100% - 32px));
+            margin: 36px auto;
+            background: #fff;
+            padding: clamp(22px, 5vw, 36px);
+            border: 1px solid rgba(24, 119, 242, .08);
+            border-radius: 18px;
+            box-shadow: 0 12px 36px rgba(24, 119, 242, .09), 0 3px 12px rgba(0, 168, 132, .06)
+        }
+
+        .wrap h1 {
+            font-size: clamp(26px, 5vw, 34px);
+            line-height: 1.2;
+            color: #111b21;
+            margin-bottom: 12px
+        }
+
+        .wrap h2 {
+            margin-top: 26px;
+            margin-bottom: 8px;
+            font-size: 19px;
+            color: #a1324a
+        }
+
+        .wrap p,
+        .wrap ul {
+            color: #444;
+            font-size: 15px;
+            line-height: 1.75
+        }
+
+        .wrap p {
+            margin: 12px 0
+        }
+
+        .wrap ul {
+            margin: 10px 0 14px;
+            padding-left: 22px
+        }
+
+        .wrap li {
+            padding-left: 3px;
+            margin: 5px 0
+        }
+
+        .wrap a {
+            color: #1877f2;
+            text-underline-offset: 3px
+        }
+
+        .meta {
+            padding: 14px 16px;
+            margin: 18px 0 24px !important;
+            border-radius: 12px;
+            background: #eef4ff;
+            border-left: 4px solid #1877f2
+        }
+
+        footer {
+            background: #111;
+            color: #ddd;
+            padding: 28px 20px;
+            text-align: center;
+            margin-top: 40px
+        }
+
+        footer div {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px 20px;
+            margin-bottom: 14px
+        }
+
+        footer a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600
+        }
+
+        footer p {
+            margin: 8px 0;
+            font-size: 13px;
+            color: #aaa
+        }
+
+        @media(max-width:680px) {
+            header {
+                position: static;
+                align-items: flex-start;
+                flex-direction: column;
+                padding: 16px 20px
+            }
+
+            nav {
+                justify-content: flex-start;
+                gap: 12px 16px
+            }
+
+            nav a.btn {
+                padding: 9px 13px
+            }
+
+            .wrap {
+                margin: 22px auto;
+                padding: 22px 18px
+            }
+
+            .wrap h2 {
+                margin-top: 22px
+            }
+        }
+
+        @media(max-width:380px) {
+            nav {
+                gap: 10px 13px
+            }
+
+            nav a {
+                font-size: 13px
+            }
+
+            .wrap {
+                width: calc(100% - 24px)
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <b>Desito <span>Bot</span></b>
+        <nav aria-label="Main navigation">
+            <a href="index.html">Home</a>
+            <a href="index.html#about">About</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="privacy.html">Privacy</a>
+            <a href="terms.html">Terms</a>
+            <a href="dashboard.html" class="btn">Go to Dashboard →</a>
+        </nav>
+    </header>
+
+    <main class="wrap">
+        <h1>Privacy Policy for Desito AI Bot</h1>
+        <p class="meta"><b>Last Updated:</b> November 12, 2026<br><b>Contact:</b> support@desito.store - Enugu, Nigeria
+        </p>
+
+        <h2>1. What We Collect</h2>
+        <p>When you login with Facebook and connect your Facebook Page, we collect:</p>
+        <ul>
+            <li>Your Facebook Name and Facebook User ID</li>
+            <li>Your Facebook Page Name, Page ID, and Page Access Token</li>
+            <li>Messages and Comments sent to your Page by your customers, so the bot can reply</li>
+            <li>Your Welcome Message, Auto-Reply Settings, and Knowledge / FAQ you set in Dashboard</li>
+        </ul>
+
+        <h2>2. How We Use Your Data</h2>
+        <p>We use your data only to:</p>
+        <ul>
+            <li>Connect your Facebook Page to our bot</li>
+            <li>Automatically reply to messages and comments on your Page using the Knowledge you provide</li>
+            <li>Show you your connected Pages in your Dashboard</li>
+            <li>Allow you to pause the bot when a human needs to take over (Handover)</li>
+        </ul>
+        <p>We do NOT sell your data. We do NOT share your data with third parties, except as required by Meta / Facebook
+            to send replies.</p>
+
+        <h2>3. Data Storage</h2>
+        <p>Your Page information and settings are stored securely on our server. Your Page Access Token is used only to
+            send replies on your behalf to your Page.</p>
+
+        <h2>4. How To Delete Your Data</h2>
+        <p>You can delete your data at any time:</p>
+        <ul>
+            <li>Go to Dashboard and click <b>Disconnect</b> on your Page - this deletes your Page Token and Settings
+                from our server immediately.</li>
+            <li>Or go to Facebook Settings &gt; Apps and Websites &gt; Remove Desito AI Bot - this revokes access.</li>
+            <li>Or email us at support@desito.store and we will delete all your data within 7 days.</li>
+        </ul>
+
+        <h2>5. Data Deletion Callback</h2>
+        <p>If you request data deletion through Facebook, we will delete all data associated with your Facebook User ID
+            and Page ID from our database.</p>
+
+        <h2>6. Children</h2>
+        <p>This service is not intended for children under 13.</p>
+
+        <h2>7. Changes To This Policy</h2>
+        <p>If we change this policy, we will update the Last Updated date on this page.</p>
+
+        <h2>8. Contact Us</h2>
+        <p>If you have any questions about this Privacy Policy, contact us at support@desito.store</p>
+    </main>
+
+    <footer>
+        <div>
+            <a href="index.html">Home</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="privacy.html">Privacy Policy</a>
+            <a href="terms.html">Terms &amp; Conditions</a>
+            <a href="cookies.html">Cookie Policy</a>
+        </div>
+        <p>Desito Bot - Your Business No Go Sleep Again.</p>
+        <p>© 2026 Desito Bot - Made in Nigeria. We help small businesses reply faster.</p>
+        <p>
+            <a class="contact-link" href="mailto:Desitotechai@gmail.com"><i class="fa-solid fa-envelope" aria-hidden="true"></i> Email: support@Desitobot.com</a>
+            <a class="contact-link" href="https://wa.me/2348108242257" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i> WhatsApp</a>
+        </p>
+    </footer>
+</body>
+
+</html>

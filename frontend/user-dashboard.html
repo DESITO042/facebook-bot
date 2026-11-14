@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard - Bot SaaS</title>
+  <style>
+    body{font-family:Arial;background:#f0f2f5;padding:20px}
+    .box{background:#fff;padding:20px;border-radius:10px;max-width:650px;margin:auto}
+    input,button{width:100%;padding:12px;margin:8px 0;border-radius:8px;border:1px solid #ccc;box-sizing:border-box}
+    button{background:#1877F2;color:#fff;border:none;font-weight:bold;cursor:pointer}
+    .page{background:#f5f5f5;padding:12px;border-radius:8px;margin:10px 0}
+    textarea{width:100%;padding:10px;margin-top:5px;border-radius:8px;border:1px solid #ccc;box-sizing:border-box;font-family:Arial}
+    .save-btn{width:auto;padding:8px 15px;margin-top:5px}
+    .toggle-btn{width:auto;padding:8px 15px;margin:5px 0;background:#1877F2;}
+    .toggle-btn.active{background:#6c757d;}
+    .logout-btn{background:#6c757d;}
+    .login-btn-wrap{
+          position:relative;
+          isolation:isolate;
+          width:min(100%,420px);
+          margin:8px 0;
+          padding:2px;
+          border-radius:18px;
+          overflow:hidden;
+        }
+        .login-btn-wrap::before{
+          content:"";
+          position:absolute;
+          inset:-70%;
+          z-index:-1;
+          background:conic-gradient(from 0deg,transparent 0deg 300deg,rgba(255,255,255,.3) 320deg,#00a884 340deg,#fff 350deg,transparent 360deg);
+          animation:login-orbit 3.5s linear infinite;
+        }
+        @keyframes login-orbit{to{transform:rotate(360deg)}}
+        .login-btn{
+          width:100%;
+          min-height:64px;
+          margin:0;
+          padding:12px 18px;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          gap:12px;
+          border:0;
+          border-radius:16px;
+          background:linear-gradient(115deg,#0866ff 0%,#1877f2 55%,#3588ff 100%);
+          box-shadow:0 10px 24px rgba(24,119,242,.28),inset 0 1px 0 rgba(255,255,255,.28);
+          color:#fff;
+          font-size:16px;
+          font-weight:700;
+          cursor:pointer;
+          transition:transform .2s ease,box-shadow .2s ease,filter .2s ease;
+        }
+        .login-btn:hover{
+          transform:translateY(-2px);
+          box-shadow:0 14px 30px rgba(24,119,242,.36),inset 0 1px 0 rgba(255,255,255,.3);
+          filter:saturate(1.08);
+        }
+        .login-btn:active{transform:translateY(0)}
+        .login-btn:focus-visible{outline:3px solid #00a884;outline-offset:4px}
+        .fb-icon{
+          width:38px;
+          height:38px;
+          display:grid;
+          place-items:center;
+          flex:0 0 38px;
+          border:1px solid rgba(24,119,242,.12);
+          border-radius:50%;
+          background:linear-gradient(145deg,#fff,#edf4ff);
+          box-shadow:0 3px 8px rgba(0,39,99,.2),inset 0 1px 2px #fff;
+        }
+        .fb-icon svg{display:block;width:25px;height:25px;filter:drop-shadow(0 1px 1px rgba(0,0,0,.12))}
+        .login-label{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center}
+        .connect-label{
+          padding:5px 9px;
+          border:1px solid rgba(255,255,255,.3);
+          border-radius:999px;
+          background:rgba(255,255,255,.14);
+          font-size:12px;
+          font-weight:600;
+          letter-spacing:.01em;
+        }
+        @media(max-width:360px){
+          .login-btn{gap:9px;padding:11px 14px;font-size:15px}
+          .fb-icon{width:34px;height:34px;flex-basis:34px}
+        }
+        @media(prefers-reduced-motion:reduce){
+          .login-btn-wrap::before{animation:none}
+          .login-btn{transition:none}
+        }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>🤖 My Bot Dashboard</h2>
+    <p>Welcome, <b id="user">Desito</b></p>
+
+    <div class="login-btn-wrap">
+      <button class="login-btn" onclick="window.location.href='/auth/facebook?next=/dashboard.html'">
+        <span class="fb-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#1877f2" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        </span>
+        Login with Facebook + Connect Page
+      </button>
+    </div>
+    <button class="logout-btn" onclick="window.location.href='/auth/logout'">Logout</button>
+    <hr>
+
+    <h3>Add Your Page</h3>
+    <input id="pageName" placeholder="Page Name e.g. Amos Store" />
+    <input id="pageId" placeholder="Page ID" />
+    <input id="pageToken" placeholder="Page Access Token" />
+    <button onclick="addPage()">+ Add Page</button>
+
+    <h3>Your Connected Pages</h3>
+    <div id="pages">Loading...</div>
+  </div>
+
+<script>
+  function toggleKnowledge(pageId){
+    let form = document.getElementById('kb-wrap-' + pageId);
+    let btn = document.getElementById('toggle-' + pageId);
+    if(form.style.display === 'none' || form.style.display === ''){
+      form.style.display = 'block';
+      btn.innerText = '− Hide Knowledge';
+      btn.classList.add('active');
+    } else {
+      form.style.display = 'none';
+      btn.innerText = '+ Add Knowledge';
+      btn.classList.remove('active');
+    }
+  }
+
+  // NEW FOR NO.4 - Show who login
+  async function loadMe(){
+    try{
+      let r = await fetch('/api/me');
+      let me = await r.json();
+      if(me.loggedIn){
+        document.getElementById('user').innerText = me.userName;
+      } else {
+        document.getElementById('user').innerText = 'Guest - Please Login';
+      }
+    }catch(e){}
+  }
+
+  async function loadPages(){
+    try{
+      let res = await fetch('/api/pages');
+      let pages = await res.json();
+      let box = document.getElementById('pages');
+      if(!pages || pages.length === 0){
+        box.innerHTML = "No page yet. Add one above.";
+        return;
+      }
+      box.innerHTML = pages.map(p => `
+        <div class="page">
+          <b>${p.name}</b><br>ID: ${p.pageId}<br>Status: ✅ ${p.status || 'Connected'}<br><br>
+          <label><b>Business Info & Price List for ${p.name}:</b></label><br>
+          <button class="toggle-btn" id="toggle-${p.pageId}" onclick="toggleKnowledge('${p.pageId}')">+ Add Knowledge</button>
+          <div id="kb-wrap-${p.pageId}" style="display:none;">
+            <textarea id="kb-${p.pageId}" rows="8" placeholder="Paste your business info here...">${p.knowledge || ''}</textarea><br>
+            <button class="save-btn" onclick="saveKnowledge('${p.pageId}')">Save Knowledge</button>
+            <span id="saved-${p.pageId}" style="color:green; margin-left:10px;"></span>
+          </div>
+        </div>
+      `).join('');
+    }catch(e){
+      document.getElementById('pages').innerHTML = "Cannot load pages - Is server.js running? Check terminal.";
+      console.log(e);
+    }
+  }
+
+  async function addPage(){
+    let name = document.getElementById('pageName').value.trim();
+    let pageId = document.getElementById('pageId').value.trim();
+    let accessToken = document.getElementById('pageToken').value.trim();
+    if(!name || !pageId){ alert('Fill Page Name and Page ID'); return; }
+    let res = await fetch('/api/pages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({name, pageId, accessToken})
+    });
+    let data = await res.json();
+    if(data.success === false){
+      alert(data.msg || 'Page already added');
+    } else {
+      alert(data.msg || 'Page Added!');
+    }
+    document.getElementById('pageName').value = '';
+    document.getElementById('pageId').value = '';
+    document.getElementById('pageToken').value = '';
+    loadPages();
+  }
+
+  async function saveKnowledge(pageId) {
+    let knowledge = document.getElementById('kb-' + pageId).value;
+    let res = await fetch(`/api/pages/${pageId}/knowledge`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ knowledge })
+    });
+    let data = await res.json();
+    if (data.success) {
+      document.getElementById('saved-' + pageId).innerText = 'Saved ✅';
+      setTimeout(() => document.getElementById('saved-' + pageId).innerText = '', 3000);
+    } else {
+      alert(data.msg || data.message || 'Save failed');
+    }
+  }
+
+  loadMe();
+  loadPages();
+</script>
+</body>
+</html>
