@@ -403,4 +403,6 @@ app.post('/api/handover/resume', async (req, res) => {
   res.json({ success: true, message: 'Bot don resume for this person ✅' });
 });
 
-app.listen(3000, () => console.log('Running on http://localhost:3000'));
+// app.listen(3000, () => console.log('Running on http://localhost:3000'));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log('Running on port ' + PORT));
