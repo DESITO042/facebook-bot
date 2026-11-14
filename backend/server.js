@@ -197,7 +197,7 @@ async function handleWithBrain(pageId, userText, type, targetId) {
     }
 
     // NORMAL BRAIN REPLY - DYNAMIC NAME, NO HARDCODE
-    const brainRes = await fetch(process.env.BRAIN_URL || 'http://localhost:8000/chat', {
+    const brainRes = await fetch(process.env.BRAIN_URL || 'https://desito-brain.onrender.com/chat', {
       method: 'POST', headers: {'Content-Type':'application/json'},
       body: JSON.stringify({ message: userText, knowledge: page.knowledge || '', page_name: businessName, business_name: businessName })
     });
