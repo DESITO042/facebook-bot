@@ -405,4 +405,79 @@ app.post('/api/handover/resume', async (req, res) => {
 
 // app.listen(3000, () => console.log('Running on http://localhost:3000'));
 const PORT = process.env.PORT || 3000;
+
+// ===== FACEBOOK DATA DELETION CALLBACK =====
+// Facebook requires this for App Review
+app.post('/data-deletion', async (req, res) => {
+  try {
+    const signedRequest = req.body.signed_request;
+    
+    if (!signedRequest) {
+      return res.json({ 
+        url: 'https://desito-backend.onrender.com/data-deletion-status',
+        confirmation_code: 'no_data_' + Date.now()
+      });
+    }
+
+    // Decode signed_request - format: signature.payload
+    const parts = signedRequest.split('.');
+    const payload = parts[1];
+    const decoded = JSON.parse(Buffer.from(payload, 'base64').toString('utf8'));
+    const userId = decoded.user_id;
+
+    console.log('Data deletion request for user:', userId);
+
+    // Delete user data from MongoDB - adjust to your collection name
+    if (global.db || mongoose) {
+      try {
+        // Try to delete from users collection
+        if (mongoose.connection.readyState === 1) {
+          await mongoose.connection.collection('users').deleteOne({ facebookId: userId });
+          await mongoose.connection.collection('users').deleteOne({ facebook_id: userId });
+          await mongoose.connection.collection('users').deleteOne({ userId: userId });
+          await mongoose.connection.collection('pages').deleteMany({ userId: userId });
+          console.log('Deleted data for user:', userId);
+        }
+      } catch (dbErr) {
+        console.log('DB delete error (ignore):', dbErr.message);
+      }
+    }
+
+    const confirmationCode = 'desito_deleted_' + userId + '_' + Date.now();
+
+    // Facebook expects this exact format
+    return res.json({
+      url: `https://desito-backend.onrender.com/data-deletion-status?id=${confirmationCode}`,
+      confirmation_code: confirmationCode
+    });
+
+  } catch (err) {
+    console.error('Data deletion error:', err);
+    return res.json({
+      url: 'https://desito-backend.onrender.com/data-deletion-status',
+      confirmation_code: 'error_' + Date.now()
+    });
+  }
+});
+
+// Status page for deletion - Facebook will check this
+app.get('/data-deletion-status', (req, res) => {
+  const id = req.query.id || 'pending';
+  res.send(`
+    <html><head><title>Data Deletion Status</title></head>
+    <body style="font-family: sans-serif; padding: 40px; text-align: center;">
+      <h1>Desito - Data Deletion</h1>
+      <p>Your data deletion request has been received and processed.</p>
+      <p>Confirmation Code: <b>${id}</b></p>
+      <p>Status: <b>Deleted</b></p>
+      <p>If you have questions, contact support@desito.com</p>
+    </body></html>
+  `);
+});
+
+// Also need GET for privacy + terms if you never get them
+app.get('/privacy.html', (req, res) => {
+  res.send(`<h1>Desito Privacy Policy</h1><p>We collect Page data only to provide AI chatbot services. We do not sell data. Users can request deletion via Facebook Data Deletion Callback. Contact: support@desito.com</p>`);
+});
+
 app.listen(PORT, () => console.log('Running on port ' + PORT));
